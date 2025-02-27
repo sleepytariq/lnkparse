@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"lnkparse/lnk"
@@ -13,6 +14,7 @@ const version string = "0.1.0"
 
 var flags struct {
 	Trim    bool
+	Json    bool
 	Version bool
 }
 
@@ -22,6 +24,7 @@ func main() {
 
 func Cmd() {
 	flag.BoolVar(&flags.Trim, "trim", false, "trim leading/trailing spaces in command line")
+	flag.BoolVar(&flags.Json, "json", false, "show output in JSON format")
 	flag.BoolVar(&flags.Version, "version", false, "show version and exit")
 	flag.Usage = func() {
 		fmt.Println(`Usage:
@@ -34,6 +37,7 @@ Examples:
 
 Flags:
   -trim        trim leading/trailing spaces in command line
+  -json        show output in JSON format
   -h, -help    show this message and exit
   -version     show version and exit`)
 	}
@@ -49,14 +53,14 @@ Flags:
 	for _, arg := range flag.CommandLine.Args() {
 		matches, err := filepath.Glob(arg)
 		if err != nil {
-            fmt.Printf("Error: failed to find matches for %s\n", arg)
+			fmt.Printf("Error: failed to find matches for %s\n", arg)
 			continue
 		}
 		targetFiles = append(targetFiles, matches...)
 	}
 
 	if len(targetFiles) == 0 {
-        fmt.Println("Error: no valid files were passed")
+		fmt.Println("Error: no valid files were passed")
 		os.Exit(1)
 	}
 
@@ -71,10 +75,25 @@ Flags:
 		lnks = append(lnks, l)
 	}
 
-	for i, l := range lnks {
-		l.ShowInfo()
-		if i < len(lnks)-1 && len(lnks) != 1 {
-			fmt.Println(strings.Repeat("-", 48))
+	if flags.Json {
+		var jsonData []byte
+		var err error
+		if len(lnks) == 1 {
+			jsonData, err = json.Marshal(lnks[0])
+		} else {
+			jsonData, err = json.Marshal(lnks)
+		}
+		if err != nil {
+			fmt.Println("Error: failed to convert to JSON")
+			os.Exit(1)
+		}
+		fmt.Println(string(jsonData))
+	} else {
+		for i, l := range lnks {
+			l.ShowInfo()
+			if i < len(lnks)-1 && len(lnks) != 1 {
+				fmt.Println(strings.Repeat("-", 48))
+			}
 		}
 	}
 
