@@ -90,7 +90,7 @@ Flags:
 		fmt.Println(string(jsonData))
 	} else {
 		for i, l := range lnks {
-			l.ShowInfo()
+			fmt.Println(l)
 			if i < len(lnks)-1 && len(lnks) != 1 {
 				fmt.Println(strings.Repeat("-", 48))
 			}
