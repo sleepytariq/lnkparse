@@ -2,8 +2,8 @@ package lnk
 
 type LnkFile struct {
 	FileName              string        `json:"FileName"`
-	HeaderSize            int32         `json:"HeaderSize"`
-	CLSID                 string        `json:"CLSID"`
+	HeaderSize            int32         `json:"-"`
+	CLSID                 string        `json:"-"`
 	DataFlags             DataFlags     `json:"DataFlags"`
 	FileAttrFlags         FileAttrFlags `json:"FileAttrFlags"`
 	CreationTimestamp     uint64        `json:"CreationTimestamp"`
@@ -14,8 +14,8 @@ type LnkFile struct {
 	ShowWindow            int32         `json:"ShowWindow"`
 	HotKey                byte          `json:"HotKey"`
 	HotKeyModifier        byte          `json:"HotKeyModifier"`
-	IDListSize            int16         `json:"IDListSize"`
-	LinkInfoSize          int32         `json:"LinkInfoSize"`
+	IDListSize            int16         `json:"-"`
+	LinkInfoSize          int32         `json:"-"`
 	Name                  string        `json:"Name"`
 	RelativePath          string        `json:"RelativePath"`
 	WorkingDir            string        `json:"WorkingDir"`
