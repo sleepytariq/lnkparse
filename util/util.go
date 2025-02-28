@@ -40,7 +40,9 @@ func ReadString(f *os.File, n int, IsUnicode bool) (string, error) {
 	return s, nil
 }
 
-func ConvertFILETIMEToUTCString(timestamp uint64) string {
+func ConvertFILETIMEToUTCString(data []byte) string {
+	var timestamp uint64
+	binary.Decode(data, binary.LittleEndian, &timestamp)
 	const fileTimeEpoch = 116444736000000000
 	seconds := (timestamp - fileTimeEpoch) / 10000000
 	nanos := (timestamp - fileTimeEpoch) % 10000000 * 100
@@ -48,7 +50,7 @@ func ConvertFILETIMEToUTCString(timestamp uint64) string {
 	if time.Since(convertedTime) < 0 {
 		convertedTime = time.Unix(0, 0).UTC()
 	}
-	return convertedTime.Format("2006-01-02 15:04:05 MST")
+	return convertedTime.Format(time.RFC3339)
 }
 
 func ConvertBytesToHumanReadableForm(size uint32) string {

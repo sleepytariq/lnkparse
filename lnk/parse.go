@@ -58,21 +58,21 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse creation timestamp for %s", path)
 	}
-	binary.Decode(data, binary.LittleEndian, &l.CreationTimestamp)
+	l.CreationTimestamp = util.ConvertFILETIMEToUTCString(data)
 
 	// parse last access timestamp
 	data, err = util.ReadBytes(f, 8)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse last access timestamp for %s", path)
 	}
-	binary.Decode(data, binary.LittleEndian, &l.LastAccessTimestamp)
+	l.LastAccessTimestamp = util.ConvertFILETIMEToUTCString(data)
 
 	// parse modification timestamp
 	data, err = util.ReadBytes(f, 8)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse modification timestamp for %s", path)
 	}
-	binary.Decode(data, binary.LittleEndian, &l.ModificationTimestamp)
+	l.ModificationTimestamp = util.ConvertFILETIMEToUTCString(data)
 
 	// parse file size
 	data, err = util.ReadBytes(f, 4)
@@ -93,21 +93,23 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse show window for %s", path)
 	}
-	binary.Decode(data, binary.LittleEndian, &l.ShowWindow)
+	var ShowWindowIntVal int32
+	binary.Decode(data, binary.LittleEndian, &ShowWindowIntVal)
+	l.ShowWindow = showWindowValues[int(ShowWindowIntVal)]
 
 	// parse hot key
 	data, err = util.ReadBytes(f, 1)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse hot key for %s", path)
 	}
-	l.HotKey = data[0]
+	l.HotKey = hotKeyValues[data[0]]
 
 	// parse hot key modifier
 	data, err = util.ReadBytes(f, 1)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse hot key modifier for %s", path)
 	}
-	l.HotKeyModifier = data[0]
+	l.HotKeyModifier = hotKeyModifiers[data[0]]
 
 	// skip remaining 10 reserved bytes
 	f.Seek(10, 1)

@@ -6,14 +6,14 @@ type LnkFile struct {
 	CLSID                 string        `json:"-"`
 	DataFlags             DataFlags     `json:"Data Flags"`
 	FileAttrFlags         FileAttrFlags `json:"File Attributes Flags"`
-	CreationTimestamp     uint64        `json:"Creation Timestamp"`
-	LastAccessTimestamp   uint64        `json:"Last Access Timestamp"`
-	ModificationTimestamp uint64        `json:"Modification Timestamp"`
+	CreationTimestamp     string        `json:"Creation Timestamp"`
+	LastAccessTimestamp   string        `json:"Last Access Timestamp"`
+	ModificationTimestamp string        `json:"Modification Timestamp"`
 	FileSize              uint32        `json:"File Size"`
 	IconIndex             int32         `json:"Icon Index"`
-	ShowWindow            int32         `json:"Show Window"`
-	HotKey                byte          `json:"Hot Key"`
-	HotKeyModifier        byte          `json:"Hot Key Modifier"`
+	ShowWindow            string        `json:"Show Window"`
+	HotKey                string        `json:"Hot Key"`
+	HotKeyModifier        string        `json:"Hot Key Modifier"`
 	IDListSize            int16         `json:"-"`
 	LinkInfoSize          int32         `json:"-"`
 	Name                  string        `json:"Name"`

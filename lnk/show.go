@@ -44,14 +44,14 @@ func (l *LnkFile) String() string {
 
 	s = append(s, fmt.Sprintf("%-24s: %s", "File Attributes Flags", strings.Join(EnabledFileAttrFlags, ", ")))
 
-	s = append(s, fmt.Sprintf("%-24s: %s", "Creation Timestamp", util.ConvertFILETIMEToUTCString(l.CreationTimestamp)))
-	s = append(s, fmt.Sprintf("%-24s: %s", "Last Access Timestamp", util.ConvertFILETIMEToUTCString(l.LastAccessTimestamp)))
-	s = append(s, fmt.Sprintf("%-24s: %s", "Modification Timestamp", util.ConvertFILETIMEToUTCString(l.ModificationTimestamp)))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Creation Timestamp", l.CreationTimestamp))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Last Access Timestamp", l.LastAccessTimestamp))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Modification Timestamp", l.ModificationTimestamp))
 	s = append(s, fmt.Sprintf("%-24s: %s", "File Size", util.ConvertBytesToHumanReadableForm(l.FileSize)))
 	s = append(s, fmt.Sprintf("%-24s: %d", "Icon Index", l.IconIndex))
-	s = append(s, fmt.Sprintf("%-24s: %s", "Show Window", showWindowValues[int(l.ShowWindow)]))
-	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key", hotKeyValues[l.HotKey]))
-	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key Modifier", hotKeyModifiers[l.HotKeyModifier]))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Show Window", l.ShowWindow))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key", l.HotKey))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key Modifier", l.HotKeyModifier))
 
 	if l.DataFlags.HasName {
 		s = append(s, fmt.Sprintf("%-24s: %s", "Name", l.Name))
