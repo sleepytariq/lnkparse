@@ -1,26 +1,26 @@
 package lnk
 
 type LnkFile struct {
-	FileName              string        `json:"FileName"`
+	FileName              string        `json:"File Name"`
 	HeaderSize            int32         `json:"-"`
 	CLSID                 string        `json:"-"`
-	DataFlags             DataFlags     `json:"DataFlags"`
-	FileAttrFlags         FileAttrFlags `json:"FileAttrFlags"`
-	CreationTimestamp     uint64        `json:"CreationTimestamp"`
-	LastAccessTimestamp   uint64        `json:"LastAccessTimestamp"`
-	ModificationTimestamp uint64        `json:"ModificationTimestamp"`
-	FileSize              uint32        `json:"FileSize"`
-	IconIndex             int32         `json:"IconIndex"`
-	ShowWindow            int32         `json:"ShowWindow"`
-	HotKey                byte          `json:"HotKey"`
-	HotKeyModifier        byte          `json:"HotKeyModifier"`
+	DataFlags             DataFlags     `json:"Data Flags"`
+	FileAttrFlags         FileAttrFlags `json:"File Attributes Flags"`
+	CreationTimestamp     uint64        `json:"Creation Timestamp"`
+	LastAccessTimestamp   uint64        `json:"Last Access Timestamp"`
+	ModificationTimestamp uint64        `json:"Modification Timestamp"`
+	FileSize              uint32        `json:"File Size"`
+	IconIndex             int32         `json:"Icon Index"`
+	ShowWindow            int32         `json:"Show Window"`
+	HotKey                byte          `json:"Hot Key"`
+	HotKeyModifier        byte          `json:"Hot Key Modifier"`
 	IDListSize            int16         `json:"-"`
 	LinkInfoSize          int32         `json:"-"`
 	Name                  string        `json:"Name"`
-	RelativePath          string        `json:"RelativePath"`
-	WorkingDir            string        `json:"WorkingDir"`
+	RelativePath          string        `json:"Relative Path"`
+	WorkingDir            string        `json:"Working Directory"`
 	Arguments             string        `json:"Arguments"`
-	IconLocation          string        `json:"IconLocation"`
+	IconLocation          string        `json:"Icon Location"`
 }
 
 type DataFlags struct {

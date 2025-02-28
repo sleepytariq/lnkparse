@@ -66,7 +66,7 @@ func (l *LnkFile) String() string {
 	}
 
 	if l.DataFlags.HasArguments {
-		s = append(s, fmt.Sprintf("%-24s: %s", "Command Line", l.Arguments))
+		s = append(s, fmt.Sprintf("%-24s: %s", "Arguments", l.Arguments))
 	}
 
 	if l.DataFlags.HasIconLocation {
