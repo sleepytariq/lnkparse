@@ -22,8 +22,9 @@ Examples:
 
 Flags:
   -trim        trim leading/trailing spaces in command line
+  -json        show output in JSON format
   -h, -help    show this message and exit
-  -version     show version and exi
+  -version     show version and exit
 ```
 
 ## References
