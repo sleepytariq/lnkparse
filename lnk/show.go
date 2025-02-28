@@ -53,6 +53,10 @@ func (l *LnkFile) String() string {
 	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key", hotKeyValues[l.HotKey]))
 	s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key Modifier", hotKeyModifiers[l.HotKeyModifier]))
 
+	if l.DataFlags.HasName {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Name", l.Name))
+	}
+
 	if l.DataFlags.HasRelativePath {
 		s = append(s, fmt.Sprintf("%-24s: %s", "Relative Path", l.RelativePath))
 	}

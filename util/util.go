@@ -20,6 +20,26 @@ func ReadBytes(f *os.File, n int) ([]byte, error) {
 	return buf, nil
 }
 
+func ReadString(f *os.File, n int, IsUnicode bool) (string, error) {
+	if IsUnicode {
+		n = n * 2
+	}
+
+	data, err := ReadBytes(f, n)
+	if err != nil {
+		return "", err
+	}
+
+	var s string
+	if IsUnicode {
+		s = DecodeUTF16(data)
+	} else {
+		s = string(data)
+	}
+
+	return s, nil
+}
+
 func ConvertFILETIMEToUTCString(timestamp uint64) string {
 	const fileTimeEpoch = 116444736000000000
 	seconds := (timestamp - fileTimeEpoch) / 10000000
@@ -46,9 +66,6 @@ func ConvertBytesToHumanReadableForm(size uint32) string {
 }
 
 func DecodeUTF16(data []byte) string {
-	if len(data)%2 != 0 {
-		data = append(data, 0x00)
-	}
 	utf16ByteArray := make([]uint16, len(data)/2)
 	for i := 0; i < len(data); i += 2 {
 		utf16ByteArray[i/2] = uint16(data[i]) | uint16(data[i+1])<<8

@@ -16,6 +16,7 @@ type LnkFile struct {
 	HotKeyModifier        byte          `json:"HotKeyModifier"`
 	IDListSize            int16         `json:"IDListSize"`
 	LinkInfoSize          int32         `json:"LinkInfoSize"`
+	Name                  string        `json:"Name"`
 	RelativePath          string        `json:"RelativePath"`
 	WorkingDir            string        `json:"WorkingDir"`
 	Arguments             string        `json:"Arguments"`
@@ -25,7 +26,7 @@ type LnkFile struct {
 type DataFlags struct {
 	HasTargetIDList             bool `json:"HasTargetIDList"`
 	HasLinkInfo                 bool `json:"HasLinkInfo"`
-	HasLinkName                 bool `json:"HasLinkName"`
+	HasName                     bool `json:"HasLinkName"`
 	HasRelativePath             bool `json:"HasRelativePath"`
 	HasWorkingDir               bool `json:"HasWorkingDir"`
 	HasArguments                bool `json:"HasArguments"`

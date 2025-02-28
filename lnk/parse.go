@@ -130,6 +130,19 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		f.Seek(int64(l.LinkInfoSize)-4, 1)
 	}
 
+	if l.DataFlags.HasName {
+		data, err = util.ReadBytes(f, 2)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse Name size for %s", path)
+		}
+		var size int16
+		binary.Decode(data, binary.LittleEndian, &size)
+		l.Name, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse Name for %s", path)
+		}
+	}
+
 	if l.DataFlags.HasRelativePath {
 		data, err = util.ReadBytes(f, 2)
 		if err != nil {
@@ -137,11 +150,10 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		}
 		var size int16
 		binary.Decode(data, binary.LittleEndian, &size)
-		data, err = util.ReadBytes(f, int(size)*2)
+		l.RelativePath, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse RelativePath for %s", path)
 		}
-		l.RelativePath = util.DecodeUTF16(data)
 	}
 
 	if l.DataFlags.HasWorkingDir {
@@ -151,11 +163,10 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		}
 		var size int16
 		binary.Decode(data, binary.LittleEndian, &size)
-		data, err = util.ReadBytes(f, int(size)*2)
+		l.WorkingDir, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse WorkingDir for %s", path)
 		}
-		l.WorkingDir = util.DecodeUTF16(data)
 	}
 
 	if l.DataFlags.HasArguments {
@@ -165,11 +176,10 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		}
 		var size int16
 		binary.Decode(data, binary.LittleEndian, &size)
-		data, err = util.ReadBytes(f, int(size)*2)
+		l.Arguments, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse Arguments for %s", path)
 		}
-		l.Arguments = util.DecodeUTF16(data)
 		if trimSpaces {
 			l.Arguments = strings.Trim(l.Arguments, " ")
 		}
@@ -178,15 +188,14 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if l.DataFlags.HasIconLocation {
 		data, err = util.ReadBytes(f, 2)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse IconLocation size for %s", path)
+			return nil, fmt.Errorf("failed to parse IconLocation size for %s <%s>", path, err)
 		}
 		var size int16
 		binary.Decode(data, binary.LittleEndian, &size)
-		data, err = util.ReadBytes(f, int(size)*2)
+		l.IconLocation, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse IconLocation for %s", path)
 		}
-		l.IconLocation = util.DecodeUTF16(data)
 	}
 
 	return &l, nil
@@ -204,7 +213,7 @@ func (l *LnkFile) ParseDataFlags(data []byte) {
 	}
 
 	if DataFlagsInt&0x00000004 != 0 {
-		l.DataFlags.HasLinkName = true
+		l.DataFlags.HasName = true
 	}
 
 	if DataFlagsInt&0x00000008 != 0 {
