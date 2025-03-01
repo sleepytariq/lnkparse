@@ -102,14 +102,18 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse hot key for %s", path)
 	}
-	l.HotKey = hotKeyValues[data[0]]
+	if l.HotKey = hotKeyValues[data[0]]; l.HotKey == "" {
+		l.HotKey = "INVALID"
+	}
 
 	// parse hot key modifier
 	data, err = util.ReadBytes(f, 1)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse hot key modifier for %s", path)
 	}
-	l.HotKeyModifier = hotKeyModifiers[data[0]]
+	if l.HotKeyModifier = hotKeyModifiers[data[0]]; l.HotKeyModifier == "" {
+		l.HotKeyModifier = "INVALID"
+	}
 
 	// skip remaining 10 reserved bytes
 	f.Seek(10, 1)
