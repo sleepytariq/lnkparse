@@ -1,29 +1,33 @@
 package lnk
 
-type LnkFile struct {
+import (
+	"time"
+)
+
+type Lnk struct {
 	FileName              string        `json:"File Name"`
-	HeaderSize            int32         `json:"-"`
-	CLSID                 string        `json:"-"`
-	DataFlags             DataFlags     `json:"Data Flags"`
-	FileAttrFlags         FileAttrFlags `json:"File Attributes Flags"`
-	CreationTimestamp     string        `json:"Creation Timestamp"`
-	LastAccessTimestamp   string        `json:"Last Access Timestamp"`
-	ModificationTimestamp string        `json:"Modification Timestamp"`
+	headerSize            int32         `json:"-"`
+	clsid                 string        `json:"-"`
+	DataFlags             dataFlags     `json:"Data Flags"`
+	FileAttrFlags         fileAttrFlags `json:"File Attributes Flags"`
+	CreationTimestamp     time.Time     `json:"Creation Timestamp"`
+	LastAccessTimestamp   time.Time     `json:"Last Access Timestamp"`
+	ModificationTimestamp time.Time     `json:"Modification Timestamp"`
 	FileSize              uint32        `json:"File Size"`
 	IconIndex             int32         `json:"Icon Index"`
 	ShowWindow            string        `json:"Show Window"`
 	HotKey                string        `json:"Hot Key"`
 	HotKeyModifier        string        `json:"Hot Key Modifier"`
-	IDListSize            int16         `json:"-"`
-	LinkInfoSize          int32         `json:"-"`
-	Name                  string        `json:"Name"`
-	RelativePath          string        `json:"Relative Path"`
-	WorkingDir            string        `json:"Working Directory"`
-	Arguments             string        `json:"Arguments"`
-	IconLocation          string        `json:"Icon Location"`
+	idListSize            int16         `json:"-"`
+	linkInfoSize          int32         `json:"-"`
+	Name                  string `json:"Name"`
+	RelativePath          string `json:"Relative Path"`
+	WorkingDir            string `json:"Working Directory"`
+	Arguments             string `json:"Arguments"`
+	IconLocation          string `json:"Icon Location"`
 }
 
-type DataFlags struct {
+type dataFlags struct {
 	HasTargetIDList             bool `json:"HasTargetIDList"`
 	HasLinkInfo                 bool `json:"HasLinkInfo"`
 	HasName                     bool `json:"HasLinkName"`
@@ -51,7 +55,7 @@ type DataFlags struct {
 	KeepLocalIDListForUNCTarget bool `json:"KeepLocalIDListForUNCTarget"`
 }
 
-type FileAttrFlags struct {
+type fileAttrFlags struct {
 	FILE_ATTRIBUTE_READONLY            bool `json:"FILE_ATTRIBUTE_READONLY"`
 	FILE_ATTRIBUTE_HIDDEN              bool `json:"FILE_ATTRIBUTE_HIDDEN"`
 	FILE_ATTRIBUTE_SYSTEM              bool `json:"FILE_ATTRIBUTE_SYSTEM"`

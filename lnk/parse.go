@@ -10,14 +10,14 @@ import (
 	"strings"
 )
 
-func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
+func ParseFromFile(path string, trimSpaces bool) (*Lnk, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %s", path)
 	}
 	defer f.Close()
 
-	l := LnkFile{}
+	l := Lnk{}
 
 	// set file name
 	l.FileName = filepath.Base(path)
@@ -27,8 +27,8 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse header size for %s", path)
 	}
-	binary.Decode(data, binary.LittleEndian, &l.HeaderSize)
-	if l.HeaderSize != 76 {
+	binary.Decode(data, binary.LittleEndian, &l.headerSize)
+	if l.headerSize != 76 {
 		return nil, fmt.Errorf("invalid file header for %s", path)
 	}
 
@@ -37,7 +37,7 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse CLSID for %s", path)
 	}
-	l.CLSID = hex.EncodeToString(data)
+	l.clsid = hex.EncodeToString(data)
 
 	// parse data flags
 	data, err = util.ReadBytes(f, 4)
@@ -58,21 +58,21 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse creation timestamp for %s", path)
 	}
-	l.CreationTimestamp = util.ConvertFILETIMEToUTCString(data)
+	l.CreationTimestamp = util.ConvertFILETIMEToUTC(data)
 
 	// parse last access timestamp
 	data, err = util.ReadBytes(f, 8)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse last access timestamp for %s", path)
 	}
-	l.LastAccessTimestamp = util.ConvertFILETIMEToUTCString(data)
+	l.LastAccessTimestamp = util.ConvertFILETIMEToUTC(data)
 
 	// parse modification timestamp
 	data, err = util.ReadBytes(f, 8)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse modification timestamp for %s", path)
 	}
-	l.ModificationTimestamp = util.ConvertFILETIMEToUTCString(data)
+	l.ModificationTimestamp = util.ConvertFILETIMEToUTC(data)
 
 	// parse file size
 	data, err = util.ReadBytes(f, 4)
@@ -123,8 +123,8 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse IDListSize for %s", path)
 		}
-		binary.Decode(data, binary.LittleEndian, &l.IDListSize)
-		f.Seek(int64(l.IDListSize), 1)
+		binary.Decode(data, binary.LittleEndian, &l.idListSize)
+		f.Seek(int64(l.idListSize), 1)
 	}
 
 	if l.DataFlags.HasLinkInfo {
@@ -132,8 +132,8 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse LinkInfoSize for %s", path)
 		}
-		binary.Decode(data, binary.LittleEndian, &l.LinkInfoSize)
-		f.Seek(int64(l.LinkInfoSize)-4, 1)
+		binary.Decode(data, binary.LittleEndian, &l.linkInfoSize)
+		f.Seek(int64(l.linkInfoSize)-4, 1)
 	}
 
 	if l.DataFlags.HasName {
@@ -207,7 +207,7 @@ func ParseFromFile(path string, trimSpaces bool) (*LnkFile, error) {
 	return &l, nil
 }
 
-func (l *LnkFile) ParseDataFlags(data []byte) {
+func (l *Lnk) ParseDataFlags(data []byte) {
 	DataFlagsInt := binary.LittleEndian.Uint32(data)
 
 	if DataFlagsInt&0x00000001 != 0 {
@@ -311,7 +311,7 @@ func (l *LnkFile) ParseDataFlags(data []byte) {
 	}
 }
 
-func (l *LnkFile) ParseFileAttrFlags(data []byte) {
+func (l *Lnk) ParseFileAttrFlags(data []byte) {
 	FileAttrFlagsInt := binary.LittleEndian.Uint32(data)
 
 	if FileAttrFlagsInt&0x00000001 != 0 {

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func (l *LnkFile) String() string {
+func (l *Lnk) String() string {
 	var s []string
 
 	s = append(s, fmt.Sprintf("%-24s: %s", "File Name", l.FileName))

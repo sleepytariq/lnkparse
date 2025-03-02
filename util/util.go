@@ -40,7 +40,7 @@ func ReadString(f *os.File, n int, IsUnicode bool) (string, error) {
 	return s, nil
 }
 
-func ConvertFILETIMEToUTCString(data []byte) string {
+func ConvertFILETIMEToUTC(data []byte) time.Time {
 	var timestamp uint64
 	binary.Decode(data, binary.LittleEndian, &timestamp)
 	const fileTimeEpoch = 116444736000000000
@@ -50,7 +50,7 @@ func ConvertFILETIMEToUTCString(data []byte) string {
 	if time.Since(convertedTime) < 0 {
 		convertedTime = time.Unix(0, 0).UTC()
 	}
-	return convertedTime.Format(time.RFC3339)
+	return convertedTime
 }
 
 func ConvertBytesToHumanReadableForm(size uint32) string {

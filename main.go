@@ -64,7 +64,7 @@ Flags:
 		os.Exit(1)
 	}
 
-	var lnks []*lnk.LnkFile
+	var lnks []*lnk.Lnk
 
 	for _, targetFile := range targetFiles {
 		l, err := lnk.ParseFromFile(targetFile, flags.Trim)
