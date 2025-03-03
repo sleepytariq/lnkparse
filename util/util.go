@@ -13,7 +13,7 @@ func ReadBytes(f *os.File, n int) ([]byte, error) {
 		return nil, fmt.Errorf("size cannot be less than 1")
 	}
 	buf := make([]byte, n)
-	err := binary.Read(f, binary.LittleEndian, &buf)
+	_, err := f.Read(buf)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +41,7 @@ func ReadString(f *os.File, n int, IsUnicode bool) (string, error) {
 }
 
 func ConvertFILETIMEToUTC(data []byte) time.Time {
-	var timestamp uint64
-	binary.Decode(data, binary.LittleEndian, &timestamp)
+	timestamp := binary.LittleEndian.Uint64(data)
 	const fileTimeEpoch = 116444736000000000
 	seconds := (timestamp - fileTimeEpoch) / 10000000
 	nanos := (timestamp - fileTimeEpoch) % 10000000 * 100
