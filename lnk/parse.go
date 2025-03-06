@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func ParseFromFile(path string, trimSpaces bool) (*Lnk, error) {
+func ParseFromFile(path string) (*Lnk, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open %s", path)
@@ -185,9 +185,6 @@ func ParseFromFile(path string, trimSpaces bool) (*Lnk, error) {
 		l.Arguments, err = util.ReadString(f, int(size), l.DataFlags.IsUnicode)
 		if err != nil {
 			return nil, fmt.Errorf("failed to parse Arguments for %s", path)
-		}
-		if trimSpaces {
-			l.Arguments = strings.Trim(l.Arguments, " ")
 		}
 	}
 

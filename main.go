@@ -67,12 +67,18 @@ Flags:
 	var lnks []*lnk.Lnk
 
 	for _, targetFile := range targetFiles {
-		l, err := lnk.ParseFromFile(targetFile, flags.Trim)
+		l, err := lnk.ParseFromFile(targetFile)
 		if err != nil {
 			fmt.Printf("Error: %s\n", err)
 			continue
 		}
 		lnks = append(lnks, l)
+	}
+
+	if flags.Trim {
+		for _, l := range lnks {
+			l.DataStrings.Arguments = strings.Trim(l.DataStrings.Arguments, " ")
+		}
 	}
 
 	if flags.Json {
