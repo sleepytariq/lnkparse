@@ -1,163 +1,250 @@
 package lnk
 
 import (
+	"fmt"
+	"lnkparse/util"
+	"reflect"
+	"strings"
 	"time"
 )
 
 type Lnk struct {
-	FileName              string        `json:"File Name"`
-	headerSize            int32         `json:"-"`
-	clsid                 string        `json:"-"`
-	DataFlags             dataFlags     `json:"Data Flags"`
-	FileAttrFlags         fileAttrFlags `json:"File Attributes Flags"`
-	CreationTimestamp     time.Time     `json:"Creation Timestamp"`
-	LastAccessTimestamp   time.Time     `json:"Last Access Timestamp"`
-	ModificationTimestamp time.Time     `json:"Modification Timestamp"`
-	FileSize              uint32        `json:"File Size"`
-	IconIndex             int32         `json:"Icon Index"`
-	ShowWindow            string        `json:"Show Window"`
-	HotKey                string        `json:"Hot Key"`
-	HotKeyModifier        string        `json:"Hot Key Modifier"`
-	idListSize            int16         `json:"-"`
-	linkInfoSize          int32         `json:"-"`
-	Name                  string `json:"Name"`
-	RelativePath          string `json:"Relative Path"`
-	WorkingDir            string `json:"Working Directory"`
-	Arguments             string `json:"Arguments"`
-	IconLocation          string `json:"Icon Location"`
+	FileName string `json:"File Name"`
+	Header   struct {
+		size      uint32
+		class     string
+		DataFlags struct {
+			HasTargetIDList             bool
+			HasLinkInfo                 bool
+			HasName                     bool
+			HasRelativePath             bool
+			HasWorkingDir               bool
+			HasArguments                bool
+			HasIconLocation             bool
+			IsUnicode                   bool
+			ForceNoLinkInfo             bool
+			HasExpString                bool
+			RunInSeparateProcess        bool
+			HasDarwinID                 bool
+			RunAsUser                   bool
+			HasExpIcon                  bool
+			NoPidlAlias                 bool
+			RunWithShimLayer            bool
+			ForceNoLinkTrack            bool
+			EnableTargetMetadata        bool
+			DisableLinkPathTracking     bool
+			DisableKnownFolderTracking  bool
+			DisableKnownFolderAlias     bool
+			AllowLinkToLink             bool
+			UnaliasOnSave               bool
+			PreferEnvironmentPath       bool
+			KeepLocalIDListForUNCTarget bool
+		} `json:"Data Flags"`
+		FileAttributeFlags struct {
+			FILE_ATTRIBUTE_READONLY            bool
+			FILE_ATTRIBUTE_HIDDEN              bool
+			FILE_ATTRIBUTE_SYSTEM              bool
+			FILE_ATTRIBUTE_DIRECTORY           bool
+			FILE_ATTRIBUTE_ARCHIVE             bool
+			FILE_ATTRIBUTE_DEVICE              bool
+			FILE_ATTRIBUTE_NORMAL              bool
+			FILE_ATTRIBUTE_TEMPORARY           bool
+			FILE_ATTRIBUTE_SPARSE_FILE         bool
+			FILE_ATTRIBUTE_REPARSE_POINT       bool
+			FILE_ATTRIBUTE_COMPRESSED          bool
+			FILE_ATTRIBUTE_OFFLINE             bool
+			FILE_ATTRIBUTE_NOT_CONTENT_INDEXED bool
+			FILE_ATTRIBUTE_ENCRYPTED           bool
+			FILE_ATTRIBUTE_VIRTUAL             bool
+		} `json:"File Attribute Flags"`
+		CreationTimestamp     time.Time `json:"Creation Timestamp"`
+		LastAccessTimestamp   time.Time `json:"Last Access Timestamp"`
+		ModificationTimestamp time.Time `json:"Modification Timestamp"`
+		FileSize              uint32    `json:"File Size"`
+		IconIndex             int32     `json:"Icon Index"`
+		ShowWindow            string    `json:"Show Window"`
+		HotKey                string    `json:"Hot Key"`
+		HotKeyModifier        string    `json:"Hot Key Modifier"`
+	}
+	LinkInfo struct {
+		size       uint32
+		headerSize uint32
+		Flags      struct {
+			VolumeIDAndLocalBasePath               bool
+			CommonNetworkRelativeLinkAndPathSuffix bool
+		}
+		volumeInfoOffset       uint32
+		localPathOffset        uint32
+		networkShareInfoOffset uint32
+		commonPathSuffixOffset uint32
+		VolumeInfo             struct {
+			size              uint32
+			DriveType         string `json:"Drive Type"`
+			DriveSerialNumber uint32 `json:"Drive Serial Number"`
+			labelOffset       uint32
+			DriveLabel        string `json:"Drive Label"`
+		} `json:"Volume Info"`
+		LocalBasePath    string `json:"Local Base Path"`
+		NetworkShareInfo struct {
+			size  uint32
+			Flags struct {
+				ValidDevice  bool
+				ValidNetType bool
+			}
+			networkShareNameOffset uint32
+			deviceNameOffset       uint32
+			ProviderType           string `json:"Provider Type"`
+			NetworkShareName       string `json:"Network Share Name"`
+			DeviceName             string `json:"Device Name"`
+		} `json:"Network Share Info"`
+		CommonPathSuffix string `json:"Common Path Suffix"`
+	} `json:"Link Info"`
+	DataStrings struct {
+		Name         string
+		RelativePath string `json:"Relative Path"`
+		WorkingDir   string `json:"Working Directory"`
+		Arguments    string
+		IconLocation string `json:"Icon Location"`
+	} `json:"Data Strings"`
+	ExtraData struct {
+		DarwinID            string `json:"Darwin ID"`
+		ExpString           string `json:"Exp String"`
+		ExpIcon             string `json:"Exp Icon"`
+		KnownFolderLocation string `json:"Known Folder Location"`
+		ShimLayer           string `json:"Shim Layer"`
+		SpecialFolderID     uint32 `json:"Special Folder ID"`
+		Tracker             struct {
+			MachineID        string `json:"Machine ID"`
+			DroidVolumeID    string `json:"Droid Volume ID"`
+			DroidFileID      string `json:"Droid File ID"`
+			DroidVolumeBirth string `json:"Droid Volume Birth"`
+			DroidFileBirth   string `json:"Droid File Birth"`
+		}
+	} `json:"Extra Data"`
 }
 
-type dataFlags struct {
-	HasTargetIDList             bool `json:"HasTargetIDList"`
-	HasLinkInfo                 bool `json:"HasLinkInfo"`
-	HasName                     bool `json:"HasLinkName"`
-	HasRelativePath             bool `json:"HasRelativePath"`
-	HasWorkingDir               bool `json:"HasWorkingDir"`
-	HasArguments                bool `json:"HasArguments"`
-	HasIconLocation             bool `json:"HasIconLocation"`
-	IsUnicode                   bool `json:"IsUnicode"`
-	ForceNoLinkInfo             bool `json:"ForceNoLinkInfo"`
-	HasExpString                bool `json:"HasExpString"`
-	RunInSeparateProcess        bool `json:"RunInSeparateProcess"`
-	HasDarwinID                 bool `json:"HasDarwinID"`
-	RunAsUser                   bool `json:"RunAsUser"`
-	HasExpIcon                  bool `json:"HasExpIcon"`
-	NoPidlAlias                 bool `json:"NoPidlAlias"`
-	RunWithShimLayer            bool `json:"RunWithShimLayer"`
-	ForceNoLinkTrack            bool `json:"ForceNoLinkTrack"`
-	EnableTargetMetadata        bool `json:"EnableTargetMetadata"`
-	DisableLinkPathTracking     bool `json:"DisableLinkPathTracking"`
-	DisableKnownFolderTracking  bool `json:"DisableKnownFolderTracking"`
-	DisableKnownFolderAlias     bool `json:"DisableKnownFolderAlias"`
-	AllowLinkToLink             bool `json:"AllowLinkToLink"`
-	UnaliasOnSave               bool `json:"UnaliasOnSave"`
-	PreferEnvironmentPath       bool `json:"PreferEnvironmentPath"`
-	KeepLocalIDListForUNCTarget bool `json:"KeepLocalIDListForUNCTarget"`
-}
+func (l *Lnk) String() string {
+	var s []string
 
-type fileAttrFlags struct {
-	FILE_ATTRIBUTE_READONLY            bool `json:"FILE_ATTRIBUTE_READONLY"`
-	FILE_ATTRIBUTE_HIDDEN              bool `json:"FILE_ATTRIBUTE_HIDDEN"`
-	FILE_ATTRIBUTE_SYSTEM              bool `json:"FILE_ATTRIBUTE_SYSTEM"`
-	FILE_ATTRIBUTE_DIRECTORY           bool `json:"FILE_ATTRIBUTE_DIRECTORY"`
-	FILE_ATTRIBUTE_ARCHIVE             bool `json:"FILE_ATTRIBUTE_ARCHIVE"`
-	FILE_ATTRIBUTE_DEVICE              bool `json:"FILE_ATTRIBUTE_DEVICE"`
-	FILE_ATTRIBUTE_NORMAL              bool `json:"FILE_ATTRIBUTE_NORMAL"`
-	FILE_ATTRIBUTE_TEMPORARY           bool `json:"FILE_ATTRIBUTE_TEMPORARY"`
-	FILE_ATTRIBUTE_SPARSE_FILE         bool `json:"FILE_ATTRIBUTE_SPARSE_FILE"`
-	FILE_ATTRIBUTE_REPARSE_POINT       bool `json:"FILE_ATTRIBUTE_REPARSE_POINT"`
-	FILE_ATTRIBUTE_COMPRESSED          bool `json:"FILE_ATTRIBUTE_COMPRESSED"`
-	FILE_ATTRIBUTE_OFFLINE             bool `json:"FILE_ATTRIBUTE_OFFLINE"`
-	FILE_ATTRIBUTE_NOT_CONTENT_INDEXED bool `json:"FILE_ATTRIBUTE_NOT_CONTENT_INDEXED"`
-	FILE_ATTRIBUTE_ENCRYPTED           bool `json:"FILE_ATTRIBUTE_ENCRYPTED"`
-	FILE_ATTRIBUTE_VIRTUAL             bool `json:"FILE_ATTRIBUTE_VIRTUAL"`
-}
+	s = append(s, fmt.Sprintf("%-24s: %s", "File Name", l.FileName))
 
-var showWindowValues = map[int]string{
-	0:   "SW_HIDE",
-	1:   "SW_NORMAL + SW_SHOWNORMAL",
-	2:   "SW_SHOWMINIMIZED",
-	3:   "SW_MAXIMIZE + SW_SHOWMAXIMIZED",
-	4:   "SW_SHOWNOACTIVATE",
-	5:   "SW_SHOW",
-	6:   "SW_MINIMIZE",
-	7:   "SW_SHOWMINNOACTIVE",
-	8:   "SW_SHOWNA",
-	9:   "SW_RESTORE",
-	10:  "SW_SHOWDEFAULT",
-	11:  "SW_FORCEMINIMIZE",
-	204: "SW_NORMALNA",
-}
+	dataVal := reflect.ValueOf(l.Header.DataFlags)
+	var EnabledDataFlags []string
+	for i := range dataVal.NumField() {
+		flag := dataVal.Type().Field(i).Name
+		enabled := dataVal.Field(i).Bool()
+		if enabled {
+			EnabledDataFlags = append(EnabledDataFlags, flag)
+		}
+	}
+	if len(EnabledDataFlags) != 0 {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Data Flags", strings.Join(EnabledDataFlags, ", ")))
+	}
 
-var hotKeyValues = map[byte]string{
-	0x00: "NONE",
-	0x30: "Numeric key 0",
-	0x31: "Numeric key 1",
-	0x32: "Numeric key 2",
-	0x33: "Numeric key 3",
-	0x34: "Numeric key 4",
-	0x35: "Numeric key 5",
-	0x36: "Numeric key 6",
-	0x37: "Numeric key 7",
-	0x38: "Numeric key 8",
-	0x39: "Numeric key 9",
-	0x41: "Upper case A",
-	0x42: "Upper case B",
-	0x43: "Upper case C",
-	0x44: "Upper case D",
-	0x45: "Upper case E",
-	0x46: "Upper case F",
-	0x47: "Upper case G",
-	0x48: "Upper case H",
-	0x49: "Upper case I",
-	0x4a: "Upper case J",
-	0x4b: "Upper case K",
-	0x4c: "Upper case L",
-	0x4d: "Upper case M",
-	0x4e: "Upper case N",
-	0x4f: "Upper case O",
-	0x50: "Upper case P",
-	0x51: "Upper case Q",
-	0x52: "Upper case R",
-	0x53: "Upper case S",
-	0x54: "Upper case T",
-	0x55: "Upper case U",
-	0x56: "Upper case V",
-	0x57: "Upper case W",
-	0x58: "Upper case X",
-	0x59: "Upper case Y",
-	0x5a: "Upper case Z",
-	0x70: "VK_F1",
-	0x71: "VK_F2",
-	0x72: "VK_F3",
-	0x73: "VK_F4",
-	0x74: "VK_F5",
-	0x75: "VK_F6",
-	0x76: "VK_F7",
-	0x77: "VK_F8",
-	0x78: "VK_F9",
-	0x79: "VK_F10",
-	0x7a: "VK_F11",
-	0x7b: "VK_F12",
-	0x7c: "VK_F13",
-	0x7d: "VK_F14",
-	0x7e: "VK_F15",
-	0x7f: "VK_F16",
-	0x80: "VK_F17",
-	0x81: "VK_F18",
-	0x82: "VK_F19",
-	0x83: "VK_F20",
-	0x84: "VK_F21",
-	0x85: "VK_F22",
-	0x86: "VK_F23",
-	0x87: "VK_F24",
-	0x90: "VK_NUMLOCK",
-	0x91: "VK_SCROLL",
-}
+	fileVal := reflect.ValueOf(l.Header.FileAttributeFlags)
+	var EnabledFileAttrFlags []string
+	for i := range fileVal.NumField() {
+		flag := fileVal.Type().Field(i).Name
+		enabled := fileVal.Field(i).Bool()
+		if enabled {
+			EnabledFileAttrFlags = append(EnabledFileAttrFlags, flag)
+		}
+	}
+	if len(EnabledFileAttrFlags) != 0 {
+		s = append(s, fmt.Sprintf("%-24s: %s", "File Attribute Flags", strings.Join(EnabledFileAttrFlags, ", ")))
+	}
 
-var hotKeyModifiers = map[byte]string{
-	0x00: "NONE",
-	0x01: "HOTKEYF_SHIFT",
-	0x02: "HOTKEYF_CONTROL",
-	0x33: "HOTKEYF_ALT",
+	s = append(s, fmt.Sprintf("%-24s: %s", "Creation Timestamp", l.Header.CreationTimestamp))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Last Access Timestamp", l.Header.LastAccessTimestamp))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Modification Timestamp", l.Header.ModificationTimestamp))
+	s = append(s, fmt.Sprintf("%-24s: %s", "File Size", util.ConvertBytesToHumanReadableForm(l.Header.FileSize)))
+	s = append(s, fmt.Sprintf("%-24s: %d", "Icon Index", l.Header.IconIndex))
+	s = append(s, fmt.Sprintf("%-24s: %s", "Show Window", l.Header.ShowWindow))
+
+	if l.Header.HotKey != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key", l.Header.HotKey))
+	}
+
+	if l.Header.HotKeyModifier != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Hot Key Modifier", l.Header.HotKeyModifier))
+	}
+
+	if l.LinkInfo.Flags.VolumeIDAndLocalBasePath {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Drive Type", l.LinkInfo.VolumeInfo.DriveType))
+		s = append(s, fmt.Sprintf("%-24s: %d", "Drive Serial Number", l.LinkInfo.VolumeInfo.DriveSerialNumber))
+		s = append(s, fmt.Sprintf("%-24s: %s", "Drive Label", l.LinkInfo.VolumeInfo.DriveLabel))
+		s = append(s, fmt.Sprintf("%-24s: %s", "Local Base Path", l.LinkInfo.LocalBasePath))
+	}
+
+	if l.LinkInfo.Flags.CommonNetworkRelativeLinkAndPathSuffix {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Provider Type", l.LinkInfo.NetworkShareInfo.ProviderType))
+		s = append(s, fmt.Sprintf("%-24s: %s", "Network Share Name", l.LinkInfo.NetworkShareInfo.NetworkShareName))
+		s = append(s, fmt.Sprintf("%-24s: %s", "Device Name", l.LinkInfo.NetworkShareInfo.DeviceName))
+	}
+
+	if l.Header.DataFlags.HasName {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Name", l.DataStrings.Name))
+	}
+
+	if l.Header.DataFlags.HasRelativePath {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Relative Path", l.DataStrings.RelativePath))
+	}
+
+	if l.Header.DataFlags.HasWorkingDir {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Working Directory", l.DataStrings.WorkingDir))
+	}
+
+	if l.Header.DataFlags.HasArguments {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Arguments", l.DataStrings.Arguments))
+	}
+
+	if l.Header.DataFlags.HasIconLocation {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Icon Location", l.DataStrings.IconLocation))
+	}
+
+	if l.Header.DataFlags.HasDarwinID {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Darwin ID", l.ExtraData.DarwinID))
+	}
+
+	if l.Header.DataFlags.HasExpString {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Exp String", l.ExtraData.ExpString))
+	}
+
+	if l.Header.DataFlags.HasExpIcon {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Exp Icon", l.ExtraData.ExpIcon))
+	}
+
+	if l.ExtraData.KnownFolderLocation != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Known Folder Location", l.ExtraData.KnownFolderLocation))
+	}
+
+	if l.Header.DataFlags.RunWithShimLayer {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Shim Layer", l.ExtraData.ShimLayer))
+	}
+
+	if l.ExtraData.SpecialFolderID != 0 {
+		s = append(s, fmt.Sprintf("%-24s: %d", "Special Folder ID", l.ExtraData.SpecialFolderID))
+	}
+
+	if l.ExtraData.Tracker.MachineID != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Machine ID", l.ExtraData.Tracker.MachineID))
+	}
+
+	if l.ExtraData.Tracker.DroidVolumeID != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Droid Volume ID", l.ExtraData.Tracker.DroidVolumeID))
+	}
+
+	if l.ExtraData.Tracker.DroidFileID != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Droid File ID", l.ExtraData.Tracker.DroidFileID))
+	}
+
+	if l.ExtraData.Tracker.DroidVolumeBirth != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Droid Volume Birth", l.ExtraData.Tracker.DroidVolumeBirth))
+	}
+
+	if l.ExtraData.Tracker.DroidFileBirth != "" {
+		s = append(s, fmt.Sprintf("%-24s: %s", "Droid File Birth", l.ExtraData.Tracker.DroidFileBirth))
+	}
+
+	return strings.Join(s, "\n")
 }

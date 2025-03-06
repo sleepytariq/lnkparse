@@ -1,6 +1,7 @@
 package util
 
 import (
+	"bytes"
 	"encoding/binary"
 	"fmt"
 	"os"
@@ -18,6 +19,21 @@ func ReadBytes(f *os.File, n int) ([]byte, error) {
 		return nil, err
 	}
 	return buf, nil
+}
+
+func ReadStringNull(f *os.File) (string, error) {
+	var buf []byte
+	for {
+		b, err := ReadBytes(f, 1)
+		if err != nil {
+			return "", err
+		}
+		if bytes.Compare(b, []byte{0x00}) == 0 {
+			break
+		}
+		buf = append(buf, b...)
+	}
+	return string(buf), nil
 }
 
 func ReadString(f *os.File, n int, IsUnicode bool) (string, error) {
@@ -72,4 +88,17 @@ func DecodeUTF16(data []byte) string {
 		utf16ByteArray[i/2] = uint16(data[i]) | uint16(data[i+1])<<8
 	}
 	return string(utf16.Decode(utf16ByteArray))
+}
+
+func BytesToGUID(data []byte) (string, error) {
+	if len(data) != 16 {
+		return "", fmt.Errorf("invalid length: expected 16 bytes, got %d", len(data))
+	}
+
+	d1 := binary.LittleEndian.Uint32(data[0:4])
+	d2 := binary.LittleEndian.Uint16(data[4:6])
+	d3 := binary.LittleEndian.Uint16(data[6:8])
+
+	return fmt.Sprintf("%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+		d1, d2, d3, data[8], data[9], data[10], data[11], data[12], data[13], data[14], data[15]), nil
 }
