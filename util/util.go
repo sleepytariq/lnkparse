@@ -92,7 +92,7 @@ func DecodeUTF16(data []byte) string {
 
 func BytesToGUID(data []byte) (string, error) {
 	if len(data) != 16 {
-		return "", fmt.Errorf("invalid length: expected 16 bytes, got %d", len(data))
+		return "", fmt.Errorf("invalid GUID length %d", len(data))
 	}
 
 	d1 := binary.LittleEndian.Uint32(data[0:4])
