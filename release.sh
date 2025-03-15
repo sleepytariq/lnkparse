@@ -11,7 +11,7 @@ if [[ -z "${GITHUB_TOKEN}" ]]; then
     exit 1
 fi
 
-VERSION=$(grep '^const version' main.go | cut -d '"' -f2)
+VERSION=$(grep '^const version' cmd/cmd.go | cut -d '"' -f2)
 
 if git tag --list | grep -q "${VERSION}"; then
     echo "version found in tags"
