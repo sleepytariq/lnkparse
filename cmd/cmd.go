@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const version string = "0.2.0"
+const version string = "0.2.1"
 
 var flags struct {
 	Trim    bool
