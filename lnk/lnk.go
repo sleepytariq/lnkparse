@@ -172,7 +172,9 @@ func (l *Lnk) String() string {
 	if l.LinkInfo.Flags.VolumeIDAndLocalBasePath {
 		s = append(s, fmt.Sprintf("%-24s: %s", "Drive Type", l.LinkInfo.VolumeInfo.DriveType))
 		s = append(s, fmt.Sprintf("%-24s: %d", "Drive Serial Number", l.LinkInfo.VolumeInfo.DriveSerialNumber))
-		s = append(s, fmt.Sprintf("%-24s: %s", "Drive Label", l.LinkInfo.VolumeInfo.DriveLabel))
+		if l.LinkInfo.VolumeInfo.DriveLabel != "" {
+			s = append(s, fmt.Sprintf("%-24s: %s", "Drive Label", l.LinkInfo.VolumeInfo.DriveLabel))
+		}
 		s = append(s, fmt.Sprintf("%-24s: %s", "Local Base Path", l.LinkInfo.LocalBasePath))
 	}
 
