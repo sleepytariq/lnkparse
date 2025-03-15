@@ -33,7 +33,6 @@ checksum:
 changelog:
   sort: asc
   filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
-      - "^chore:"
+    include:
+      - "^fix:"
+      - "^feat:"
