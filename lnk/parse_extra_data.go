@@ -15,7 +15,7 @@ func (l *Lnk) parseExtraData(f *os.File) error {
 		if err != nil {
 			return err
 		}
-		if bytes.Compare(data, []byte{0x00, 0x00, 0x00, 0x00}) == 0 {
+		if bytes.Equal(data, []byte{0x00, 0x00, 0x00, 0x00}) {
 			break
 		}
 		var blockSize uint32
