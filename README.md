@@ -5,9 +5,7 @@ A tool to parse .lnk files
 ## Installation
 
 - Download a prebuilt binary from [release page](https://github.com/sleepytariq/lnkparse/releases/latest)
-
-  _or_
-- `git clone https://github.com/sleepytariq/lnkparse && cd lnkparse && go build -ldflags="-s -w" .`
+- Build from source using `git clone https://github.com/sleepytariq/lnkparse && cd lnkparse && go build -ldflags="-s -w" .`
 
 ## Usage
 
